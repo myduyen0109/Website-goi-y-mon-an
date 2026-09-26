@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>{{ food['tenmon'] }} - Gợi ý món ăn</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+```
+
+</head>
+
+<body>
+
+```
+<!-- HEADER -->
+<header class="main-header">
+    <div class="header-container">
+
+        <a href="{{ url_for('home') }}" class="logo">
+            🍽️ Gợi ý món ăn
+        </a>
+
+        <nav class="main-nav">
+            <a href="{{ url_for('home') }}">Trang chủ</a>
+
+            <a href="{{ url_for('search') }}">
+                Tìm món ăn
+            </a>
+
+            <a href="{{ url_for('today') }}">
+                Hôm nay ăn gì?
+            </a>
+        </nav>
+
+        <div class="user-menu">
+            {% if session.get('manguoidung') %}
+
+                <span>
+                    Xin chào, {{ session.get('hoten') }}
+                </span>
+
+                <a href="{{ url_for('logout') }}">
+                    Đăng xuất
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}">
+                    Đăng nhập
+                </a>
+
+                <a href="{{ url_for('register') }}">
+                    Đăng ký
+                </a>
+
+            {% endif %}
+        </div>
+
+    </div>
+</header>
+
+
+<!-- MAIN CONTENT -->
+<main class="food-detail-page">
+
+    <div class="food-detail-container">
+
+        <!-- NÚT QUAY LẠI -->
+        <a href="{{ url_for('search') }}" class="back-button">
+            ← Quay lại tìm món ăn
+        </a>
+
+
+        <!-- THÔNG TIN MÓN ĂN -->
+        <section class="food-detail-card">
+
+            <!-- HÌNH ĐẠI DIỆN -->
+            <div class="food-detail-image">
+
+                <div class="food-detail-placeholder">
+                    🍲
+                </div>
+
+            </div>
+
+
+            <!-- NỘI DUNG -->
+            <div class="food-detail-content">
+
+                <!-- TÊN MÓN -->
+                <h1>
+                    {{ food['tenmon'] }}
+                </h1>
+
+
+                <!-- DANH MỤC -->
+                {% if food['tendanhmuc'] %}
+                    <div class="food-detail-category">
+                        {{ food['tendanhmuc'] }}
+                    </div>
+                {% endif %}
+
+
+                <!-- MÔ TẢ -->
+                {% if food['mota'] %}
+                    <p class="food-detail-description">
+                        {{ food['mota'] }}
+                    </p>
+                {% endif %}
+
+
+                <!-- THÔNG TIN -->
+                <div class="food-detail-meta">
+
+                    {% if food['thoigian'] %}
+                        <div class="detail-info-item">
+                            <span class="detail-icon">⏱️</span>
+                            <div>
+                                <strong>Thời gian</strong>
+                                <p>
+                                    {{ food['thoigian'] }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                    {% if food['chiphi'] %}
+                        <div class="detail-info-item">
+                            <span class="detail-icon">💰</span>
+                            <div>
+                                <strong>Chi phí</strong>
+                                <p>
+                                    {{ food['chiphi'] }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+
+                    {% if food['kcal'] %}
+                        <div class="detail-info-item">
+                            <span class="detail-icon">🔥</span>
+                            <div>
+                                <strong>Năng lượng</strong>
+                                <p>
+                                    {{ food['kcal'] }} kcal
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- NGUYÊN LIỆU -->
+        {% if food['nguyenlieu'] %}
+            <section class="food-detail-section">
+
+                <h2>🥬 Nguyên liệu</h2>
+
+                <div class="ingredient-box">
+                    {{ food['nguyenlieu'] }}
+                </div>
+
+            </section>
+        {% endif %}
+
+
+        <!-- SỐ LƯỢNG -->
+        {% if food['soluong'] %}
+            <section class="food-detail-section">
+
+                <h2>📋 Số lượng</h2>
+
+                <div class="ingredient-box">
+                    {{ food['soluong'] }}
+                </div>
+
+            </section>
+        {% endif %}
+
+
+        <!-- ĐÁNH GIÁ -->
+        <section class="food-detail-section">
+
+            <h2>⭐ Đánh giá món ăn</h2>
+
+            <div class="rating-box">
+
+                <span class="star">☆</span>
+                <span class="star">☆</span>
+                <span class="star">☆</span>
+                <span class="star">☆</span>
+                <span class="star">☆</span>
+
+            </div>
+
+            <p class="rating-note">
+                Chức năng đánh giá sẽ được kết nối với bảng
+                <strong>tuongtacmonan</strong>.
+            </p>
+
+        </section>
+
+
+        <!-- NÚT QUAY LẠI -->
+        <div class="detail-actions">
+
+            <a href="{{ url_for('home') }}"
+               class="detail-button">
+                ← Về trang chủ
+            </a>
+
+            <a href="{{ url_for('search') }}"
+               class="detail-button">
+                🔎 Tìm món khác
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- FOOTER -->
+<footer class="main-footer">
+
+    <p>
+        © 2026 Gợi ý món ăn
+    </p>
+
+</footer>
+
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+```
+
+</body>
+</html>
