@@ -1,282 +1,275 @@
-<!DOCTYPE html>
-<html lang="vi">
+{% extends "user/base.html" %}
 
-<head>
+{% block title %}
+Tìm kiếm món ăn - Gợi Ý Món Ăn
+{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<div class="container">
 
-    <title>Tìm kiếm món ăn</title>
+    <h1>🔍 Tìm kiếm món ăn</h1>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <p>
+        Tìm món ăn theo tên món hoặc nguyên liệu bạn đang có.
+    </p>
 
-</head>
+    <form method="POST" action="{{ url_for('search') }}" >
 
+        <!-- ========================= -->
+        <!-- THANH TÌM KIẾM -->
+        <!-- ========================= -->
 
-<body>
+        <div class="form-group">
 
-<!-- =========================
-     HEADER
-========================= -->
-
-<header class="main-header">
-
-    <div class="header-container">
-
-        <a href="{{ url_for('home') }}"
-           class="logo">
-            🍽️ Gợi ý món ăn
-        </a>
-
-
-        <nav class="main-nav">
-
-            <a href="{{ url_for('home') }}">
-                Trang chủ
-            </a>
-
-            <a href="{{ url_for('search') }}">
-                Tìm món ăn
-            </a>
-
-            <a href="{{ url_for('today') }}">
-                Hôm nay ăn gì?
-            </a>
-
-        </nav>
-
-
-        <div class="user-menu">
-
-            {% if session.get("manguoidung") %}
-
-                <span>
-                    Xin chào, {{ session.get("hoten") }}
-                </span>
-
-                <a href="{{ url_for('logout') }}">
-                    Đăng xuất
-                </a>
-
-            {% else %}
-
-                <a href="{{ url_for('login') }}">
-                    Đăng nhập
-                </a>
-
-                <a href="{{ url_for('register') }}">
-                    Đăng ký
-                </a>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-</header>
-
-
-
-<!-- =========================
-     SEARCH
-========================= -->
-
-<main class="search-page">
-
-    <section class="search-header">
-
-        <h1>
-            Tìm kiếm món ăn
-        </h1>
-
-        <p>
-            Nhập tên món ăn hoặc nguyên liệu bạn muốn tìm
-        </p>
-
-
-        <form
-            action="{{ url_for('search') }}"
-            method="GET"
-            id="searchForm"
-            class="search-form">
+            <label for="keyword">
+                Tên món ăn hoặc nguyên liệu
+            </label>
 
             <input
                 type="text"
-                id="searchInput"
-                name="q"
+                id="keyword"
+                name="keyword"
                 value="{{ keyword }}"
-                placeholder="Ví dụ: phở, gà, trứng..."
+                placeholder="Ví dụ: cơm gà hoặc ức gà, cà rốt..."
                 autocomplete="off"
+                required
             >
 
-            <button type="submit">
-                🔍 Tìm kiếm
-            </button>
+        </div>
 
-        </form>
-
-    </section>
-
+        <p class="search-hint">
+            💡 Nếu nhập nhiều nguyên liệu,
+            hãy ngăn cách bằng dấu phẩy.
+        </p>
 
 
-    <!-- =========================
-         KẾT QUẢ
-    ========================= -->
+        <!-- ========================= -->
+        <!-- BỘ LỌC -->
+        <!-- ========================= -->
 
-    <section class="search-results">
+        <details class="filter-menu">
 
-        {% if keyword %}
-
-            <h2>
-                Kết quả tìm kiếm cho:
-                "{{ keyword }}"
-            </h2>
-
-        {% else %}
-
-            <h2>
-                Tất cả món ăn
-            </h2>
-
-        {% endif %}
+            <summary class="filter-button">
+                ⚙ Bộ lọc
+            </summary>
 
 
+            <div class="filter-panel">
 
-        {% if foods %}
+                <!-- NGÂN SÁCH -->
 
-            <p class="result-count">
-                Tìm thấy {{ foods|length }} món ăn
-            </p>
+                <div class="filter-item">
 
+                    <label for="budget">
+                        💰 Ngân sách tối đa
+                    </label>
 
-            <div class="food-grid">
+                    <div class="filter-input-row">
 
-                {% for food in foods %}
+                        <input
+                            type="number"
+                            id="budget"
+                            name="budget"
+                            value="{{ budget }}"
+                            placeholder="Ví dụ: 40000"
+                            min="0"
+                        >
 
-                    <div class="food-card">
-
-
-                        <!-- ICON MÓN ĂN -->
-
-                        <div class="food-image">
-
-                            <div class="no-image">
-                                🍲
-                            </div>
-
-                        </div>
-
-
-                        <!-- THÔNG TIN -->
-
-                        <div class="food-info">
-
-                            <h3>
-                                {{ food["tenmon"] }}
-                            </h3>
-
-
-                            {% if food["tendanhmuc"] %}
-
-                                <span class="food-category">
-
-                                    {{ food["tendanhmuc"] }}
-
-                                </span>
-
-                            {% endif %}
-
-
-                            <p class="food-description">
-
-                                {{ food["mota"] or
-                                   "Chưa có mô tả món ăn." }}
-
-                            </p>
-
-
-                            <div class="food-meta">
-
-                                <span>
-                                    ⏱ {{ food["thoigian"] }}
-                                </span>
-
-                                <span>
-                                    💰 {{ food["chiphi"] }}
-                                </span>
-
-                            </div>
-
-
-                            <a
-                                href="{{ url_for(
-                                    'food_detail',
-                                    mamon=food['mamon']
-                                ) }}"
-                                class="detail-button">
-
-                                Xem chi tiết
-
-                            </a>
-
-                        </div>
+                        <span>VNĐ</span>
 
                     </div>
 
-                {% endfor %}
-
-            </div>
-
-
-        {% else %}
-
-            <div class="empty-search">
-
-                <div class="empty-icon">
-                    🔍
                 </div>
 
-                <h3>
-                    Không tìm thấy món ăn
-                </h3>
 
-                <p>
-                    Hãy thử tìm kiếm bằng tên món ăn
-                    hoặc nguyên liệu khác.
-                </p>
+                <!-- DANH MỤC -->
+
+                <div class="filter-item">
+
+                    <label for="category">
+                        🍽️ Danh mục
+                    </label>
+
+                    <select
+                        id="category"
+                        name="category"
+                    >
+
+                        <option value="">
+                            Tất cả danh mục
+                        </option>
+
+                        {% for item in categories %}
+
+                            <option
+                                value="{{ item.madanhmuc }}"
+                                {% if category == item.madanhmuc|string %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ item.tendanhmuc }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- THỜI GIAN -->
+
+                <div class="filter-item">
+
+                    <label for="max_time">
+                        ⏱️ Thời gian nấu tối đa
+                    </label>
+
+                    <div class="filter-input-row">
+
+                        <input
+                            type="number"
+                            id="max_time"
+                            name="max_time"
+                            value="{{ max_time }}"
+                            placeholder="Ví dụ: 30"
+                            min="0"
+                        >
+
+                        <span>phút</span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- KCAL -->
+
+                <div class="filter-item">
+
+                    <label for="max_kcal">
+                        🔥 Năng lượng tối đa
+                    </label>
+
+                    <div class="filter-input-row">
+
+                        <input
+                            type="number"
+                            id="max_kcal"
+                            name="max_kcal"
+                            value="{{ max_kcal }}"
+                            placeholder="Ví dụ: 500"
+                            min="0"
+                        >
+
+                        <span>kcal</span>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        {% endif %}
-
-    </section>
-
-</main>
+        </details>
 
 
+        <!-- ========================= -->
+        <!-- BUTTON -->
+        <!-- ========================= -->
 
-<!-- =========================
-     FOOTER
-========================= -->
+        <button
+            type="submit"
+            class="btn search-button"
+        >
+            🔍 Tìm món ăn
+        </button>
 
-<footer class="main-footer">
-
-    <p>
-        © 2026 Website Gợi ý món ăn
-    </p>
-
-</footer>
+    </form>
 
 
-<script src="{{ url_for(
-    'static',
-    filename='js/main.js'
-) }}"></script>
+    <!-- ========================= -->
+    <!-- KẾT QUẢ -->
+    <!-- ========================= -->
 
-</body>
+    {% if foods %}
 
-</html>
+        <hr>
+
+        <h2>🍽️ Kết quả tìm kiếm</h2>
+
+        <p>
+            Từ khóa:
+            <strong>{{ keyword }}</strong>
+        </p>
+
+
+        <div class="food-list">
+
+            {% for food in foods %}
+
+                <div class="food-card">
+
+                    {% if session.get("manguoidung") and food.get("_recommendation_score", 0) > 0 %}
+                        <div class="recommendation-label">
+                            ✨ Gợi ý phù hợp với bạn
+                        </div>
+                    {% endif %}
+
+                    <h3>
+                        {{ food.tenmon }}
+                    </h3>
+
+                    <p>
+                        {{ food.mota or "Chưa có mô tả." }}
+                    </p>
+
+                    <p>
+                        🍽️ Danh mục:
+                        {{ food.tendanhmuc or "Chưa phân loại" }}
+                    </p>
+
+                    <p>
+                        💰 Chi phí:
+                        <strong>
+                            {{ "{:,.0f}".format(food.chiphi or 0) }}
+                            VNĐ
+                        </strong>
+                    </p>
+
+                    <p>
+                        ⏱️ Thời gian:
+                            {{ food.thoigian or 0 }}
+                        phút
+                    </p>
+
+                    <p>
+                        🔥 Năng lượng:
+                            {{ food.kcal or 0 }}
+                        kcal
+                    </p>
+
+                    <a href="{{ url_for('food_detail', mamon=food.mamon) }}"    class="btn">
+                        Xem chi tiết
+                    </a>
+
+                </div>
+
+    {% endfor %}
+
+</div>
+
+
+    {% elif request.method == "POST" %}
+
+        <hr>
+
+        <p>
+            ❌ Không tìm thấy món ăn phù hợp.
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

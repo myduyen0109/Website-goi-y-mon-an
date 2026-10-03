@@ -1,210 +1,90 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Dashboard - Gợi ý món ăn</title>
+    <title>Admin - Quản trị hệ thống</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
 
 <body>
 
-    <!-- HEADER -->
-    <header class="admin-header">
+    <div class="container">
 
-        <div class="admin-logo">
-            🍽️ Gợi Ý Món Ăn
-        </div>
+        <h1>Quản trị hệ thống</h1>
 
-        <div class="admin-account">
-            Xin chào, {{ session.get('name', 'Admin') }}
-        </div>
-
-    </header>
-
-
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-
-        <h3>QUẢN TRỊ</h3>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            📊 Dashboard
-        </a>
-
-        <a href="{{ url_for('admin_foods') }}">
-            🍲 Quản lý món ăn
-        </a>
-
-        <a href="{{ url_for('admin_ingredients') }}">
-            🥕 Quản lý nguyên liệu
-        </a>
-
-        <a href="{{ url_for('admin_users') }}">
-            👤 Quản lý người dùng
-        </a>
+        <p>
+            Xin chào,
+            <strong>{{ session.get("hoten") }}</strong>
+        </p>
 
         <hr>
 
-        <a href="{{ url_for('home') }}">
-            🏠 Về trang chủ
-        </a>
+        <h2>Chức năng quản trị</h2>
 
-        <a href="{{ url_for('logout') }}">
-            🚪 Đăng xuất
-        </a>
+        <div class="admin-menu">
 
-    </aside>
+            <a href="{{ url_for('admin_users') }}" class="admin-card">
+                <h3>👤 Quản lý người dùng</h3>
+                <p>
+                    Quản lý tài khoản và quyền của người dùng.
+                </p>
+            </a>
 
+            <a href="{{ url_for('admin_foods') }}" class="admin-card">
+                <h3>🍲 Quản lý món ăn</h3>
+                <p>
+                    Thêm, sửa, xóa và quản lý thông tin món ăn.
+                </p>
+            </a>
 
-    <!-- MAIN -->
-    <main class="admin-main">
+            <a href="{{ url_for('admin_ingredients') }}" class="admin-card">
+                <h3>🥕 Quản lý nguyên liệu</h3>
+                <p>
+                    Quản lý danh sách nguyên liệu và thông tin liên quan.
+                </p>
+            </a>
 
-        <h1>Dashboard</h1>
+            <a href="{{ url_for('admin_categories') }}" class="admin-card">
+                <h3>📂 Quản lý danh mục</h3>
+                <p>
+                    Quản lý các danh mục món ăn.
+                </p>
+            </a>
 
-        <p class="admin-description">
-            Tổng quan dữ liệu của hệ thống gợi ý món ăn.
-        </p>
+            <a href="{{ url_for('admin_reviews') }}" class="admin-card">
+                <h3>⭐ Quản lý đánh giá</h3>
+                <p>
+                    Xem và quản lý đánh giá, bình luận của người dùng.
+                </p>
+            </a>
 
+            <a href="{{ url_for('admin_related_data') }}" class="admin-card">
 
-        <!-- THỐNG KÊ -->
-        <div class="dashboard-grid">
-
-            <!-- USERS -->
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    👤
-                </div>
-
-                <div>
-                    <h3>Người dùng</h3>
-
-                    <p>
-                        {{ stats.get('users', 0) }}
-                    </p>
-                </div>
-
-            </div>
-
-
-            <!-- FOODS -->
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    🍲
-                </div>
-
-                <div>
-                    <h3>Món ăn</h3>
-
-                    <p>
-                        {{ stats.get('foods', 0) }}
-                    </p>
-                </div>
-
-            </div>
-
-
-            <!-- INGREDIENTS -->
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    🥕
-                </div>
-
-                <div>
-                    <h3>Nguyên liệu</h3>
-
-                    <p>
-                        {{ stats.get('ingredients', 0) }}
-                    </p>
-                </div>
-
-            </div>
-
-
-            <!-- REVIEWS -->
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    ⭐
-                </div>
-
-                <div>
-                    <h3>Đánh giá</h3>
-
-                    <p>
-                        {{ stats.get('reviews', 0) }}
-                    </p>
-                </div>
-
-            </div>
+                <h3>🔗 Quản lý dữ liệu liên quan</h3>
+                <p>
+                    Quản lý dữ liệu phục vụ hoạt động gợi ý món ăn.
+                </p>
+            </a>
 
         </div>
 
+        <hr>
 
-        <!-- CHỨC NĂNG -->
-        <section class="admin-section">
+        <a href="{{ url_for('home') }}" class="btn">
+            ← Về trang người dùng
+        </a>
 
-            <h2>Quản lý hệ thống</h2>
+        <a href="{{ url_for('logout') }}" class="btn">
+            Đăng xuất
+        </a>
 
-            <div class="admin-menu-grid">
-
-                <a href="{{ url_for('admin_foods') }}"
-                   class="admin-menu-card">
-
-                    <span>🍲</span>
-
-                    <h3>Quản lý món ăn</h3>
-
-                    <p>
-                        Thêm và xóa thông tin món ăn.
-                    </p>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_ingredients') }}"
-                   class="admin-menu-card">
-
-                    <span>🥕</span>
-
-                    <h3>Quản lý nguyên liệu</h3>
-
-                    <p>
-                        Quản lý danh sách nguyên liệu.
-                    </p>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_users') }}"
-                   class="admin-menu-card">
-
-                    <span>👤</span>
-
-                    <h3>Quản lý người dùng</h3>
-
-                    <p>
-                        Xem thông tin tài khoản người dùng.
-                    </p>
-
-                </a>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </div>
 
 </body>
-
 </html>

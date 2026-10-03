@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin - Quản lý đánh giá</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Quản lý đánh giá</h1>
+
+        <p>
+            Xin chào,
+            <strong>{{ session.get("hoten") }}</strong>
+        </p>
+
+        <hr>
+
+        <h2>Danh sách đánh giá</h2>
+
+        <table class="admin-table">
+
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Người dùng</th>
+                    <th>Email</th>
+                    <th>Món ăn</th>
+                    <th>Đánh giá</th>
+                    <th>Bình luận</th>
+                    <th>Ngày đánh giá</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% if reviews %}
+
+                    {% for review in reviews %}
+
+                    <tr>
+
+                        <td>
+                            {{ review.madanhgia }}
+                        </td>
+
+                        <td>
+                            {{ review.hoten }}
+                        </td>
+
+                        <td>
+                            {{ review.email }}
+                        </td>
+
+                        <td>
+                            {{ review.tenmon }}
+                        </td>
+
+                        <td>
+                            {{ review.diem }}/5 ⭐
+                        </td>
+
+                        <td>
+                            {% if review.binhluan %}
+                                {{ review.binhluan }}
+                            {% else %}
+                                <span>Không có bình luận</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ review.ngaytao }}
+                        </td>
+
+                        <td class="admin-actions">
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin_reviews') }}"
+                                class="inline-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="delete"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="madanhgia"
+                                    value="{{ review.madanhgia }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn-delete-small"
+                                    onclick="return confirm('Bạn có chắc muốn xóa đánh giá này?');"
+                                >
+                                    Xóa
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8">
+                            Chưa có đánh giá nào.
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+        <hr>
+
+    <!-- =========================
+             ĐIỀU HƯỚNG
+             ========================= -->
+
+        <a
+    href="{{ url_for('admin') }}"
+    class="btn"
+>
+    ← Quay lại quản trị
+</a>
+      
+
+    </div>
+
+</body>
+
+</html>

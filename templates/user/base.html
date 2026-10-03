@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Gợi Ý Món Ăn
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="container header-content">
+
+            <!-- LOGO -->
+            <a href="{{ url_for('home') }}" class="logo">
+                🍴 Gợi Ý Món Ăn
+            </a>
+
+            <!-- MENU -->
+            <nav class="navbar">
+
+                <a href="{{ url_for('home') }}">
+                    Trang chủ
+                </a>
+
+                <a href="{{ url_for('search') }}">Tìm món ăn</a>
+
+                <a href="{{ url_for('today') }}">Hôm nay ăn gì?</a>
+
+                
+
+                <a href="{{ url_for('favorites') }}">
+                    ❤️ Yêu thích
+                </a>
+
+
+
+
+
+
+<!-- ĐĂNG NHẬP -->                
+                {% if session.get("manguoidung") %}
+
+    <span>
+        Xin chào, {{ session.get("hoten") }}
+    </span>
+
+    <a href="{{ url_for('logout') }}">
+        Đăng xuất
+    </a>
+
+{% else %}
+
+    <a href="{{ url_for('login') }}">
+        Đăng nhập
+    </a>
+
+    <a href="{{ url_for('register') }}">
+        Đăng ký
+    </a>
+
+{% endif %}
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- NỘI DUNG -->
+    <main class="main">
+
+        <div class="container">
+
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+                © 2026 Website Gợi Ý Món Ăn
+            </p>
+
+            <p>
+                Gợi ý món ăn dựa trên nguyên liệu và hành vi người dùng
+            </p>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>

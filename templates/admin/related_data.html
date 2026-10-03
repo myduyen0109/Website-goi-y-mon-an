@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin - Quản lý dữ liệu liên quan</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Quản lý dữ liệu liên quan</h1>
+
+        <p>
+            Xin chào,
+            <strong>{{ session.get("hoten") }}</strong>
+        </p>
+
+        <hr>
+
+        <h2>Dữ liệu món ăn - nguyên liệu</h2>
+
+        <table class="admin-table">
+
+            <thead>
+
+                <tr>
+                    <th>Món ăn</th>
+                    <th>Nguyên liệu</th>
+                    <th>Số lượng</th>
+                    <th>Đơn vị</th>
+                    <th>Giá tham khảo</th>
+                    <th>Chi phí</th>
+                    <th>Kcal</th>
+                    <th>Thao tác</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% if related_data %}
+
+                    {% for item in related_data %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.tenmon }}
+                        </td>
+
+                        <td>
+                            {{ item.tennguyenlieu }}
+                        </td>
+
+                        <td>
+                            {{ item.soluong }}
+                        </td>
+
+                        <td>
+                            {{ item.donvi }}
+                        </td>
+
+                        <td>
+                            {{ "{:,.0f}".format(item.giathamkhao or 0) }} đ
+                        </td>
+
+                        <td>
+                            {{ "{:,.0f}".format(item.chiphi or 0) }} đ
+                        </td>
+
+                        <td>
+                            {{ "{:,.1f}".format(item.nangluong or 0) }}
+                        </td>
+
+                        <td class="admin-actions">
+
+                            <a
+                                href="#edit-related-{{ item.mamon }}-{{ item.manguyenlieu }}"
+                                class="btn-small"
+                            >
+                                Sửa
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin_related_data') }}"
+                                class="inline-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="delete"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="mamon"
+                                    value="{{ item.mamon }}"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="manguyenlieu"
+                                    value="{{ item.manguyenlieu }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn-delete-small"
+                                    onclick="return confirm('Bạn có chắc muốn xóa liên kết này?');"
+                                >
+                                    Xóa
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8">
+                            Chưa có dữ liệu liên quan.
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- =========================
+             THÊM LIÊN KẾT
+        ========================== -->
+
+        <div class="add-food-section">
+
+            <a
+                href="#add-related"
+                class="add-food-button"
+            >
+                + Thêm dữ liệu liên quan
+            </a>
+
+        </div>
+
+
+        <div
+            id="add-related"
+            class="admin-form-card add-food-form"
+        >
+
+            <h2>Thêm dữ liệu liên quan</h2>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_related_data') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="add"
+                >
+
+
+                <div class="form-group">
+
+                    <label>
+                        Món ăn
+                    </label>
+
+                    <select
+                        name="mamon"
+                        required
+                    >
+
+                        <option value="">
+                            -- Chọn món ăn --
+                        </option>
+
+                        {% for food in foods %}
+
+                        <option value="{{ food.mamon }}">
+                            {{ food.tenmon }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Nguyên liệu
+                    </label>
+
+                    <select
+                        name="manguyenlieu"
+                        required
+                    >
+
+                        <option value="">
+                            -- Chọn nguyên liệu --
+                        </option>
+
+                        {% for ingredient in ingredients %}
+
+                        <option value="{{ ingredient.manguyenlieu }}">
+                            {{ ingredient.tennguyenlieu }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Số lượng
+                    </label>
+
+                    <input
+                        type="number"
+                        name="soluong"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="Ví dụ: 150"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Đơn vị
+                    </label>
+
+                    <input
+                        type="text"
+                        name="donvi"
+                        placeholder="Ví dụ: g"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu dữ liệu
+                </button>
+
+                <a
+                    href="{{ url_for('admin_related_data') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================
+             FORM SỬA
+        ========================== -->
+
+        {% for item in related_data %}
+
+        <div
+            id="edit-related-{{ item.mamon }}-{{ item.manguyenlieu }}"
+            class="admin-form-card edit-related-card"
+        >
+
+            <h2>
+                Sửa dữ liệu liên quan
+            </h2>
+
+            <p>
+                <strong>Món ăn:</strong>
+                {{ item.tenmon }}
+            </p>
+
+            <p>
+                <strong>Nguyên liệu:</strong>
+                {{ item.tennguyenlieu }}
+            </p>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_related_data') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="edit"
+                >
+
+                <input
+                    type="hidden"
+                    name="mamon"
+                    value="{{ item.mamon }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="manguyenlieu"
+                    value="{{ item.manguyenlieu }}"
+                >
+
+
+                <div class="form-group">
+
+                    <label>
+                        Số lượng
+                    </label>
+
+                    <input
+                        type="number"
+                        name="soluong"
+                        value="{{ item.soluong }}"
+                        min="0.01"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Đơn vị
+                    </label>
+
+                    <input
+                        type="text"
+                        name="donvi"
+                        value="{{ item.donvi or '' }}"
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu thay đổi
+                </button>
+
+                <a
+                    href="{{ url_for('admin_related_data') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+
+
+        <hr>
+
+
+        <a
+            href="{{ url_for('home') }}"
+            class="btn"
+        >
+            ← Về trang người dùng
+        </a>
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="btn"
+        >
+            Đăng xuất
+        </a>
+
+    </div>
+
+</body>
+
+</html>

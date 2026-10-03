@@ -2,257 +2,411 @@
 <html lang="vi">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản lý nguyên liệu</title>
 
-    <title>Quản lý nguyên liệu</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
-
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
-
 
 <body>
 
-    <!-- HEADER -->
-    <header class="admin-header">
-
-        <div class="admin-logo">
-            🍽️ Gợi Ý Món Ăn
-        </div>
-
-        <div>
-            Xin chào, {{ session.get('name', 'Admin') }}
-        </div>
-
-    </header>
-
-
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
-
-        <h3>QUẢN TRỊ</h3>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            📊 Dashboard
-        </a>
-
-        <a href="{{ url_for('admin_foods') }}">
-            🍲 Quản lý món ăn
-        </a>
-
-        <a href="{{ url_for('admin_ingredients') }}"
-           class="active">
-            🥕 Quản lý nguyên liệu
-        </a>
-
-        <a href="{{ url_for('admin_users') }}">
-            👤 Quản lý người dùng
-        </a>
-
-        <hr>
-
-        <a href="{{ url_for('home') }}">
-            🏠 Về trang chủ
-        </a>
-
-        <a href="{{ url_for('logout') }}">
-            🚪 Đăng xuất
-        </a>
-
-    </aside>
-
-
-    <!-- MAIN -->
-    <main class="admin-main">
+    <div class="container">
 
         <h1>Quản lý nguyên liệu</h1>
 
-        <p class="admin-description">
-            Quản lý danh sách nguyên liệu được sử dụng
-            trong hệ thống gợi ý món ăn.
+        <p>
+            Xin chào,
+            <strong>{{ session.get("hoten") }}</strong>
         </p>
 
+        <hr>
 
-        <!-- FLASH -->
-        {% with messages = get_flashed_messages() %}
+        <!-- =========================
+             DANH SÁCH NGUYÊN LIỆU
+             ========================= -->
 
-            {% if messages %}
+        <h2>Danh sách nguyên liệu</h2>
 
-                <div class="flash-container">
+        <table class="admin-table">
 
-                    {% for message in messages %}
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên nguyên liệu</th>
+                    <th>Đơn vị</th>
+                    <th>Giá tham khảo</th>
+                    <th>Kcal</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
 
-                        <div class="alert">
-                            {{ message }}
-                        </div>
+            <tbody>
+
+                {% if ingredients %}
+
+                    {% for ingredient in ingredients %}
+
+                    <tr>
+
+                        <td>
+                            {{ ingredient.manguyenlieu }}
+                        </td>
+
+                        <td>
+                            {{ ingredient.tennguyenlieu }}
+                        </td>
+
+                        <td>
+                            {{ ingredient.donvi or "-" }}
+                        </td>
+
+                        <td>
+                            {{ "{:,.0f}".format(ingredient.giathamkhao or 0) }} đ
+                        </td>
+
+                        <td>
+                            {{ "{:,.2f}".format(ingredient.kcal or 0) }}
+                        </td>
+
+                        <td class="admin-actions">
+
+                            <!-- SỬA -->
+                            <a
+                                href="#edit-{{ ingredient.manguyenlieu }}"
+                                class="btn-small"
+                            >
+                                Sửa
+                            </a>
+
+                            <!-- XÓA -->
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin_ingredients') }}"
+                                class="inline-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="delete"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="manguyenlieu"
+                                    value="{{ ingredient.manguyenlieu }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn-delete-small"
+                                    onclick="return confirm('Bạn có chắc muốn xóa nguyên liệu này?');"
+                                >
+                                    Xóa
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
 
                     {% endfor %}
 
-                </div>
+                {% else %}
 
-            {% endif %}
+                    <tr>
 
-        {% endwith %}
+                        <td colspan="6">
+                            Chưa có nguyên liệu nào.
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
 
 
-        <!-- FORM THÊM NGUYÊN LIỆU -->
-        <section class="admin-form-card">
+        <!-- =========================
+             THÊM NGUYÊN LIỆU
+             ========================= -->
 
-            <h2>
-                ➕ Thêm nguyên liệu
-            </h2>
+        <div class="add-food-section">
+
+            <a
+                href="#add-ingredient"
+                class="add-food-button"
+            >
+                + Thêm nguyên liệu
+            </a>
+
+        </div>
+
+
+        <div
+            id="add-ingredient"
+            class="admin-form-card add-food-form"
+        >
+
+            <h2>Thêm nguyên liệu</h2>
 
             <form
                 method="POST"
-                action="{{ url_for(
-                    'admin_add_ingredient'
-                ) }}">
+                action="{{ url_for('admin_ingredients') }}"
+            >
 
-                <div class="form-inline">
+                <input
+                    type="hidden"
+                    name="action"
+                    value="add"
+                >
+
+                <div class="admin-form-grid">
 
                     <div class="form-group">
 
-                        <label for="name">
+                        <label for="add-tennguyenlieu">
                             Tên nguyên liệu
                         </label>
 
                         <input
                             type="text"
-                            id="name"
-                            name="name"
+                            id="add-tennguyenlieu"
+                            name="tennguyenlieu"
                             placeholder="Ví dụ: Thịt gà"
                             required
                         >
 
                     </div>
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary">
 
-                        ➕ Thêm nguyên liệu
+                    <div class="form-group">
 
-                    </button>
+                        <label for="add-donvi">
+                            Đơn vị
+                        </label>
+
+                        <input
+                            type="text"
+                            id="add-donvi"
+                            name="donvi"
+                            placeholder="Ví dụ: g, ml, quả"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="add-giathamkhao">
+                            Giá tham khảo
+                        </label>
+
+                        <input
+                            type="number"
+                            id="add-giathamkhao"
+                            name="giathamkhao"
+                            min="0"
+                            step="0.01"
+                            placeholder="Ví dụ: 120"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="add-kcal">
+                            Kcal
+                        </label>
+
+                        <input
+                            type="number"
+                            id="add-kcal"
+                            name="kcal"
+                            min="0"
+                            step="0.01"
+                            placeholder="Ví dụ: 165"
+                            required
+                        >
+
+                    </div>
 
                 </div>
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu nguyên liệu
+                </button>
+
+                <a
+                    href="{{ url_for('admin_ingredients') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
 
             </form>
 
-        </section>
+        </div>
 
 
-        <!-- DANH SÁCH -->
-        <section class="admin-table-card">
+        <!-- =========================
+             FORM SỬA
+             ========================= -->
 
-            <div class="section-heading">
+        {% for ingredient in ingredients %}
 
-                <h2>
-                    📋 Danh sách nguyên liệu
-                </h2>
+        <div
+            id="edit-{{ ingredient.manguyenlieu }}"
+            class="admin-form-card edit-ingredient-card"
+        >
 
-                <span>
-                    {{ ingredients|length }} nguyên liệu
-                </span>
+            <h2>
+                Sửa nguyên liệu:
+                {{ ingredient.tennguyenlieu }}
+            </h2>
 
-            </div>
+            <form
+                method="POST"
+                action="{{ url_for('admin_ingredients') }}"
+            >
 
+                <input
+                    type="hidden"
+                    name="action"
+                    value="edit"
+                >
 
-            {% if ingredients %}
-
-            <div class="table-wrapper">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>ID</th>
-
-                            <th>Tên nguyên liệu</th>
-
-                            <th>Thao tác</th>
-
-                        </tr>
-
-                    </thead>
+                <input
+                    type="hidden"
+                    name="manguyenlieu"
+                    value="{{ ingredient.manguyenlieu }}"
+                >
 
 
-                    <tbody>
+                <div class="admin-form-grid">
 
-                        {% for ingredient in ingredients %}
+                    <div class="form-group">
 
-                        <tr>
+                        <label>
+                            Tên nguyên liệu
+                        </label>
 
-                            <td>
-                                {{ ingredient.id }}
-                            </td>
+                        <input
+                            type="text"
+                            name="tennguyenlieu"
+                            value="{{ ingredient.tennguyenlieu }}"
+                            required
+                        >
 
-                            <td>
-                                <strong>
-                                    {{ ingredient.name }}
-                                </strong>
-                            </td>
-
-                            <td>
-
-                                <form
-                                    method="POST"
-                                    action="{{ url_for(
-                                        'admin_delete_ingredient',
-                                        ingredient_id=ingredient.id
-                                    ) }}"
-                                    class="delete-form">
-
-                                    <button
-                                        type="submit"
-                                        class="btn-small btn-danger">
-
-                                        🗑️ Xóa
-
-                                    </button>
-
-                                </form>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            {% else %}
-
-                <div class="empty-state">
-
-                    <div>
-                        🥕
                     </div>
 
-                    <p>
-                        Chưa có nguyên liệu nào.
-                    </p>
+
+                    <div class="form-group">
+
+                        <label>
+                            Đơn vị
+                        </label>
+
+                        <input
+                            type="text"
+                            name="donvi"
+                            value="{{ ingredient.donvi or '' }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Giá tham khảo
+                        </label>
+
+                        <input
+                            type="number"
+                            name="giathamkhao"
+                            value="{{ ingredient.giathamkhao or 0 }}"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Kcal
+                        </label>
+
+                        <input
+                            type="number"
+                            name="kcal"
+                            value="{{ ingredient.kcal or 0 }}"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
 
                 </div>
 
-            {% endif %}
 
-        </section>
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu thay đổi
+                </button>
 
-    </main>
+                <a
+                    href="{{ url_for('admin_ingredients') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
 
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <hr>
+
+
+        <!-- =========================
+             ĐIỀU HƯỚNG
+             ========================= -->
+
+        <a
+    href="{{ url_for('admin') }}"
+    class="btn"
+>
+    ← Quay lại quản trị
+</a>
+
+
+    </div>
 
 </body>
 

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin - Quản lý danh mục</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Quản lý danh mục</h1>
+
+        <p>
+            Xin chào,
+            <strong>{{ session.get("hoten") }}</strong>
+        </p>
+
+        <hr>
+
+        <h2>Danh sách danh mục</h2>
+
+        <table class="admin-table">
+
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên danh mục</th>
+                    <th>Số món ăn</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% if categories %}
+
+                    {% for category in categories %}
+
+                    <tr>
+
+                        <td>
+                            {{ category.madanhmuc }}
+                        </td>
+
+                        <td>
+                            {{ category.tendanhmuc }}
+                        </td>
+
+                        <td>
+                            {{ category.so_mon }}
+                        </td>
+
+                        <td class="admin-actions">
+
+                            <a
+                                href="#edit-category-{{ category.madanhmuc }}"
+                                class="btn-small"
+                            >
+                                Sửa
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin_categories') }}"
+                                class="inline-form"
+                            >
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="delete"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="madanhmuc"
+                                    value="{{ category.madanhmuc }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn-delete-small"
+                                    onclick="return confirm('Bạn có chắc muốn xóa danh mục này?');"
+                                >
+                                    Xóa
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+                        <td colspan="4">
+                            Chưa có danh mục nào.
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+
+        <!-- =========================
+             THÊM DANH MỤC
+             ========================= -->
+
+        <div class="add-food-section">
+
+            <a
+                href="#add-category"
+                class="add-food-button"
+            >
+                + Thêm danh mục
+            </a>
+
+        </div>
+
+
+        <div
+            id="add-category"
+            class="admin-form-card add-food-form"
+        >
+
+            <h2>Thêm danh mục</h2>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_categories') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="add"
+                >
+
+                <div class="form-group">
+
+                    <label for="tendanhmuc">
+                        Tên danh mục
+                    </label>
+
+                    <input
+                        type="text"
+                        id="tendanhmuc"
+                        name="tendanhmuc"
+                        placeholder="Ví dụ: Món chính"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu danh mục
+                </button>
+
+                <a
+                    href="{{ url_for('admin_categories') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================
+             FORM SỬA DANH MỤC
+             ========================= -->
+
+        {% for category in categories %}
+
+        <div
+            id="edit-category-{{ category.madanhmuc }}"
+            class="admin-form-card edit-category-card"
+        >
+
+            <h2>
+                Sửa danh mục:
+                {{ category.tendanhmuc }}
+            </h2>
+
+            <form
+                method="POST"
+                action="{{ url_for('admin_categories') }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="edit"
+                >
+
+                <input
+                    type="hidden"
+                    name="madanhmuc"
+                    value="{{ category.madanhmuc }}"
+                >
+
+                <div class="form-group">
+
+                    <label>
+                        Tên danh mục
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tendanhmuc"
+                        value="{{ category.tendanhmuc }}"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn"
+                >
+                    Lưu thay đổi
+                </button>
+
+                <a
+                    href="{{ url_for('admin_categories') }}"
+                    class="btn"
+                >
+                    Hủy
+                </a>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+
+
+        <hr>
+
+
+         <!-- =========================
+             ĐIỀU HƯỚNG
+             ========================= -->
+
+        <a
+    href="{{ url_for('admin') }}"
+    class="btn"
+>
+    ← Quay lại quản trị
+</a>
+
+    </div>
+
+</body>
+
+</html>

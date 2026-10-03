@@ -5,255 +5,161 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Quản lý nguyên liệu</title>
+    <title>Quản lý người dùng</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 
 </head>
 
-
 <body>
 
-    <!-- HEADER -->
-    <header class="admin-header">
+<div class="container">
 
-        <div class="admin-logo">
-            🍽️ Gợi Ý Món Ăn
-        </div>
+    <h1>Quản lý người dùng</h1>
 
-        <div>
-            Xin chào, {{ session.get('name', 'Admin') }}
-        </div>
+    <p>
+        Danh sách tài khoản trong hệ thống.
+    </p>
 
-    </header>
+    <hr>
 
+    {% if users %}
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <table class="admin-table">
 
-        <h3>QUẢN TRỊ</h3>
+        <thead>
 
-        <a href="{{ url_for('admin_dashboard') }}">
-            📊 Dashboard
-        </a>
+            <tr>
+                <th>Mã</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Quyền</th>
+                <th>Ngày tạo</th>
+                <th>Thao tác</th>
+            </tr>
 
-        <a href="{{ url_for('admin_foods') }}">
-            🍲 Quản lý món ăn
-        </a>
+        </thead>
 
-        <a href="{{ url_for('admin_ingredients') }}"
-           class="active">
-            🥕 Quản lý nguyên liệu
-        </a>
+        <tbody>
 
-        <a href="{{ url_for('admin_users') }}">
-            👤 Quản lý người dùng
-        </a>
+        {% for user in users %}
 
-        <hr>
+            <tr>
 
-        <a href="{{ url_for('home') }}">
-            🏠 Về trang chủ
-        </a>
+                <td>
+                    {{ user.manguoidung }}
+                </td>
 
-        <a href="{{ url_for('logout') }}">
-            🚪 Đăng xuất
-        </a>
+                <td>
+                    {{ user.hoten }}
+                </td>
 
-    </aside>
+                <td>
+                    {{ user.email }}
+                </td>
 
+                <td>
 
-    <!-- MAIN -->
-    <main class="admin-main">
+                    {% if user.quyen == "admin" %}
+                        <strong>Admin</strong>
+                    {% else %}
+                        User
+                    {% endif %}
 
-        <h1>Quản lý nguyên liệu</h1>
+                </td>
 
-        <p class="admin-description">
-            Quản lý danh sách nguyên liệu được sử dụng
-            trong hệ thống gợi ý món ăn.
-        </p>
+                <td>
+                    {{ user.ngaytao.strftime("%d/%m/%Y %H:%M") }}
+                </td>
 
+                <td>
 
-        <!-- FLASH -->
-        {% with messages = get_flashed_messages() %}
+                    {% if user.manguoidung == session.get("manguoidung") %}
 
-            {% if messages %}
+                        <span>
+                            Tài khoản hiện tại
+                        </span>
 
-                <div class="flash-container">
+                    {% else %}
 
-                    {% for message in messages %}
-
-                        <div class="alert">
-                            {{ message }}
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-            {% endif %}
-
-        {% endwith %}
-
-
-        <!-- FORM THÊM NGUYÊN LIỆU -->
-        <section class="admin-form-card">
-
-            <h2>
-                ➕ Thêm nguyên liệu
-            </h2>
-
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_add_ingredient'
-                ) }}">
-
-                <div class="form-inline">
-
-                    <div class="form-group">
-
-                        <label for="name">
-                            Tên nguyên liệu
-                        </label>
-
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            placeholder="Ví dụ: Thịt gà"
-                            required
+                        <form
+                            method="POST"
+                            action="{{ url_for('admin_users') }}"
                         >
 
-                    </div>
+                            <input
+                                type="hidden"
+                                name="manguoidung"
+                                value="{{ user.manguoidung }}"
+                            >
 
-                    <button
-                        type="submit"
-                        class="btn btn-primary">
+                            <select name="quyen">
 
-                        ➕ Thêm nguyên liệu
+                                <option
+                                    value="user"
+                                    {% if user.quyen == "user" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    User
+                                </option>
 
-                    </button>
+                                <option
+                                    value="admin"
+                                    {% if user.quyen == "admin" %}
+                                    selected
+                                    {% endif %}
+                                >
+                                    Admin
+                                </option>
 
-                </div>
+                            </select>
 
-            </form>
+                            <button
+                                type="submit"
+                                class="btn-small"
+                            >
+                                Cập nhật
+                            </button>
 
-        </section>
+                        </form>
 
+                    {% endif %}
 
-        <!-- DANH SÁCH -->
-        <section class="admin-table-card">
+                </td>
 
-            <div class="section-heading">
+            </tr>
 
-                <h2>
-                    📋 Danh sách nguyên liệu
-                </h2>
+        {% endfor %}
 
-                <span>
-                    {{ ingredients|length }} nguyên liệu
-                </span>
+        </tbody>
 
-            </div>
+    </table>
 
+    {% else %}
 
-            {% if ingredients %}
+        <p>Chưa có người dùng nào.</p>
 
-            <div class="table-wrapper">
+    {% endif %}
 
-                <table>
+    <br>
 
-                    <thead>
+    <a
+        href="{{ url_for('admin') }}"
+        class="btn"
+    >
+        ← Quay lại quản trị
+    </a>
 
-                        <tr>
-
-                            <th>ID</th>
-
-                            <th>Tên nguyên liệu</th>
-
-                            <th>Thao tác</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for ingredient in ingredients %}
-
-                        <tr>
-
-                            <td>
-                                {{ ingredient.id }}
-                            </td>
-
-                            <td>
-                                <strong>
-                                    {{ ingredient.name }}
-                                </strong>
-                            </td>
-
-                            <td>
-
-                                <form
-                                    method="POST"
-                                    action="{{ url_for(
-                                        'admin_delete_ingredient',
-                                        ingredient_id=ingredient.id
-                                    ) }}"
-                                    class="delete-form">
-
-                                    <button
-                                        type="submit"
-                                        class="btn-small btn-danger">
-
-                                        🗑️ Xóa
-
-                                    </button>
-
-                                </form>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            {% else %}
-
-                <div class="empty-state">
-
-                    <div>
-                        🥕
-                    </div>
-
-                    <p>
-                        Chưa có nguyên liệu nào.
-                    </p>
-
-                </div>
-
-            {% endif %}
-
-        </section>
-
-    </main>
-
-
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</div>
 
 </body>
-
 </html>

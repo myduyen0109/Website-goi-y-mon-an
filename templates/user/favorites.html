@@ -1,0 +1,94 @@
+{% extends "user/base.html" %}
+
+{% block title %}
+Món ăn yêu thích - Gợi Ý Món Ăn
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>❤️ Món ăn yêu thích</h1>
+
+    {% if foods %}
+
+        <p>
+            Bạn đã lưu
+            <strong>{{ foods|length }}</strong>
+            món ăn.
+        </p>
+
+        <div class="food-list">
+
+            {% for food in foods %}
+
+                <div class="food-card">
+
+                    <h3>
+                        {{ food.tenmon }}
+                    </h3>
+
+                    <p>
+                        {{ food.mota or "Chưa có mô tả." }}
+                    </p>
+
+                    <p>
+                        🍽️ Danh mục:
+                        {{ food.tendanhmuc or "Chưa phân loại" }}
+                    </p>
+
+                    <p>
+                        💰 Chi phí:
+                        <strong>
+                            {{ "{:,.0f}".format(food.chiphi or 0) }}
+                            VNĐ
+                        </strong>
+                    </p>
+
+                    <p>
+                        ⏱️ Thời gian:
+                        {{ food.thoigian or 0 }}
+                        phút
+                    </p>
+
+                    <p>
+                        🔥 Năng lượng:
+                        {{ food.kcal or 0 }}
+                        kcal
+                    </p>
+
+                    <a
+                        href="{{ url_for('food_detail', mamon=food.mamon) }}"
+                        class="btn"
+                    >
+                        Xem chi tiết
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-message">
+
+            <p>
+                🤍 Bạn chưa có món ăn yêu thích nào.
+            </p>
+
+            <a
+                href="{{ url_for('search') }}"
+                class="btn"
+            >
+                🔍 Tìm món ăn
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

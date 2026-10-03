@@ -2,208 +2,1026 @@
 <html lang="vi">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Admin Dashboard - Gợi ý món ăn</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Quản lý món ăn</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
 </head>
+<div class="container">
 
-<body>
+    <h1>Quản lý món ăn</h1>
 
-    <!-- HEADER -->
-    <header class="admin-header">
+    <p>
+        Quản lý danh sách món ăn trong hệ thống.
+    </p>
 
-        <div class="admin-logo">
-            🍽️ Gợi Ý Món Ăn
-        </div>
+    <hr>
 
-        <div class="admin-account">
-            Xin chào, {{ session.get('name', 'Admin') }}
-        </div>
+    <!-- =========================
+         DANH SÁCH MÓN ĂN
+    ========================== -->
 
-    </header>
+    <h2>📋 Danh sách món ăn</h2>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
 
-    <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+            {% for category, message in messages %}
 
-        <h3>QUẢN TRỊ</h3>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            📊 Dashboard
-        </a>
-
-        <a href="{{ url_for('admin_foods') }}">
-            🍲 Quản lý món ăn
-        </a>
-
-        <a href="{{ url_for('admin_ingredients') }}">
-            🥕 Quản lý nguyên liệu
-        </a>
-
-        <a href="{{ url_for('admin_users') }}">
-            👤 Quản lý người dùng
-        </a>
-
-        <hr>
-
-        <a href="{{ url_for('home') }}">
-            🏠 Về trang chủ
-        </a>
-
-        <a href="{{ url_for('logout') }}">
-            🚪 Đăng xuất
-        </a>
-
-    </aside>
-
-
-    <!-- MAIN -->
-    <main class="admin-main">
-
-        <h1>Dashboard</h1>
-
-        <p class="admin-description">
-            Tổng quan dữ liệu của hệ thống gợi ý món ăn.
-        </p>
-
-
-        <!-- THỐNG KÊ -->
-        <div class="dashboard-grid">
-
-            <!-- USERS -->
-            <div class="stat-card">
-
-                <div class="stat-icon">
-                    👤
+                <div class="alert {{ category }}">
+                    {{ message }}
                 </div>
 
-                <div>
-                    <h3>Người dùng</h3>
+            {% endfor %}
 
-                    <p>
-                        {{ stats.get('users', 0) }}
-                    </p>
+        {% endif %}
+    {% endwith %}
+
+
+    <table class="admin-table">
+
+        <thead>
+
+            <tr>
+                <th>Mã</th>
+                <th>Tên món</th>
+                <th>Danh mục</th>
+                <th>Nguyên liệu</th>
+                <th>Thời gian</th>
+                <th>Chi phí</th>
+                <th>Kcal</th>
+                <th>Thao tác</th>
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for food in foods %}
+
+            <tr>
+
+                <!-- MÃ -->
+
+                <td>
+                    {{ food.mamon }}
+                </td>
+
+
+                <!-- TÊN MÓN -->
+
+                <td>
+
+                    <strong>
+                        {{ food.tenmon }}
+                    </strong>
+
+                </td>
+
+
+                <!-- DANH MỤC -->
+
+                <td>
+                    {{ food.tendanhmuc or "-" }}
+                </td>
+
+
+                <!-- NGUYÊN LIỆU -->
+
+                <td>
+
+                    {% if food.danh_sach_nguyenlieu %}
+
+                        {{ food.danh_sach_nguyenlieu }}
+
+                    {% else %}
+
+                        <span>
+                            Chưa có nguyên liệu
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- THỜI GIAN -->
+
+                <td>
+                    {{ food.thoigian }} phút
+                </td>
+
+
+                <!-- CHI PHÍ TỰ TÍNH -->
+
+                <td>
+
+                    <strong>
+                        {{ "{:,.0f}".format(food.chiphi_tinh or 0) }} đ
+                    </strong>
+
+                </td>
+
+
+                <!-- KCAL TỰ TÍNH -->
+
+                <td>
+
+                    <strong>
+                        {{ "{:,.1f}".format(food.kcal_tinh or 0) }}
+                    </strong>
+
+                </td>
+
+
+                <!-- THAO TÁC -->
+
+                <td>
+
+                    <a
+                        href="{{ url_for(
+                            'admin_foods',
+                            edit=food.mamon
+                        ) }}"
+                        class="btn-small"
+                    >
+                        Sửa
+                    </a>
+
+
+                    <form
+                        method="POST"
+                        style="display: inline;"
+                        onsubmit="return confirm(
+                            'Bạn có chắc muốn xóa món ăn này không?'
+                        );"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="delete"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="mamon"
+                            value="{{ food.mamon }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn-delete-small"
+                        >
+                            Xóa
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="8">
+                    Chưa có món ăn nào.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+
+    <!-- =========================
+         THÊM MÓN ĂN
+    ========================== -->
+
+    <div class="add-food-section">
+
+        <a
+            href="#add-food"
+            class="add-food-button"
+        >
+            ＋ Thêm món ăn
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+         FORM SỬA MÓN ĂN
+    ========================== -->
+
+    {% if edit_food %}
+
+    <div class="admin-form-card">
+
+        <h2>✏️ Sửa món ăn</h2>
+
+        <br>
+
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="action"
+                value="edit"
+            >
+
+            <input
+                type="hidden"
+                name="mamon"
+                value="{{ edit_food.mamon }}"
+            >
+
+
+            <!-- THÔNG TIN CƠ BẢN -->
+
+            <div class="admin-form-grid">
+
+
+                <!-- TÊN MÓN -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tên món
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tenmon"
+                        value="{{ edit_food.tenmon }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- DANH MỤC -->
+
+                <div class="form-group">
+
+                    <label>
+                        Danh mục
+                    </label>
+
+                    <select
+                        name="madanhmuc"
+                        style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid #ccc;
+                            border-radius: 6px;
+                            font-size: 15px;
+                        "
+                    >
+
+                        {% for category in categories %}
+
+                        <option
+                            value="{{ category.madanhmuc }}"
+                            {% if category.madanhmuc == edit_food.madanhmuc %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ category.tendanhmuc }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- THỜI GIAN -->
+
+                <div class="form-group">
+
+                    <label>
+                        Thời gian (phút)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="thoigian"
+                        min="0"
+                        value="{{ edit_food.thoigian }}"
+                    >
+
                 </div>
 
             </div>
 
 
-            <!-- FOODS -->
-            <div class="stat-card">
+            <!-- MÔ TẢ -->
 
-                <div class="stat-icon">
-                    🍲
+            <div class="form-group">
+
+                <label>
+                    Mô tả
+                </label>
+
+                <textarea
+                    name="mota"
+                    rows="4"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ccc;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-family: Arial, sans-serif;
+                        resize: vertical;
+                    "
+                >{{ edit_food.mota or "" }}</textarea>
+
+            </div>
+
+
+            <!-- CÁCH LÀM -->
+
+            <div class="form-group">
+
+                <label>
+                    Cách làm
+                </label>
+
+                <textarea
+                    name="cachlam"
+                    rows="6"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ccc;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-family: Arial, sans-serif;
+                        resize: vertical;
+                    "
+                >{{ edit_food.cachlam or "" }}</textarea>
+
+            </div>
+
+
+            <!-- =========================
+                 NGUYÊN LIỆU
+            ========================== -->
+
+            <div class="ingredient-section">
+
+                <h3>
+                    🥕 Nguyên liệu
+                </h3>
+
+                <br>
+
+
+                <div id="edit-ingredients">
+
+
+                    {% for item in edit_ingredients %}
+
+                    <div class="ingredient-row">
+
+
+                        <!-- NGUYÊN LIỆU -->
+
+                        <select
+                            name="manguyenlieu[]"
+                            onchange="updateIngredientUnit(this)"
+                        >
+
+                            {% for ingredient in ingredients %}
+
+                            <option
+                                value="{{ ingredient.manguyenlieu }}"
+                                data-unit="{{ ingredient.donvi }}"
+                                {% if ingredient.manguyenlieu == item.manguyenlieu %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ ingredient.tennguyenlieu }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <!-- SỐ LƯỢNG -->
+
+                        <input
+                            type="number"
+                            name="soluong[]"
+                            min="0.01"
+                            step="0.01"
+                            value="{{ item.soluong }}"
+                            placeholder="Số lượng"
+                        >
+
+
+                        <!-- ĐƠN VỊ -->
+
+                        <input
+                            type="text"
+                            name="donvi[]"
+                            class="ingredient-unit"
+                            value="{{ item.donvi }}"
+                            readonly
+                        >
+
+
+                        <!-- XÓA NGUYÊN LIỆU -->
+
+                        <button
+                            type="button"
+                            class="btn-remove-ingredient"
+                            onclick="this.parentElement.remove()"
+                        >
+                            Xóa
+                        </button>
+
+                    </div>
+
+                    {% endfor %}
+
+
                 </div>
 
-                <div>
-                    <h3>Món ăn</h3>
 
-                    <p>
-                        {{ stats.get('foods', 0) }}
-                    </p>
+                <!-- THÊM NGUYÊN LIỆU -->
+
+                <button
+                    type="button"
+                    class="btn-add-ingredient"
+                    onclick="addEditIngredient()"
+                >
+                    ＋ Thêm nguyên liệu
+                </button>
+
+
+                <!-- THÔNG BÁO TỰ TÍNH -->
+
+                <div class="auto-calculated-note">
+
+                    💰 <strong>Chi phí:</strong>
+                    Tự động tính dựa trên nguyên liệu.
+
+                    <br><br>
+
+                    🔥 <strong>Kcal:</strong>
+                    Tự động tính dựa trên nguyên liệu.
+
                 </div>
 
             </div>
 
 
-            <!-- INGREDIENTS -->
-            <div class="stat-card">
+            <br>
 
-                <div class="stat-icon">
-                    🥕
+
+            <!-- NÚT LƯU -->
+
+            <button
+                type="submit"
+                class="btn"
+            >
+                Lưu thay đổi
+            </button>
+
+
+            <!-- NÚT HỦY -->
+
+            <a
+                href="{{ url_for('admin_foods') }}"
+                class="btn"
+            >
+                Hủy
+            </a>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- =========================
+         FORM THÊM MÓN ĂN
+         HIỆN KHI BẤM #add-food
+    ========================== -->
+
+    <div
+        id="add-food"
+        class="admin-form-card add-food-form"
+    >
+
+        <h2>
+            ＋ Thêm món ăn
+        </h2>
+
+        <br>
+
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="action"
+                value="add"
+            >
+
+
+            <!-- THÔNG TIN CƠ BẢN -->
+
+            <div class="admin-form-grid">
+
+
+                <!-- TÊN -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tên món
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tenmon"
+                        required
+                    >
+
                 </div>
 
-                <div>
-                    <h3>Nguyên liệu</h3>
 
-                    <p>
-                        {{ stats.get('ingredients', 0) }}
-                    </p>
+                <!-- DANH MỤC -->
+
+                <div class="form-group">
+
+                    <label>
+                        Danh mục
+                    </label>
+
+                    <select
+                        name="madanhmuc"
+                        style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 1px solid #ccc;
+                            border-radius: 6px;
+                            font-size: 15px;
+                        "
+                    >
+
+                        {% for category in categories %}
+
+                        <option
+                            value="{{ category.madanhmuc }}"
+                        >
+                            {{ category.tendanhmuc }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- THỜI GIAN -->
+
+                <div class="form-group">
+
+                    <label>
+                        Thời gian (phút)
+                    </label>
+
+                    <input
+                        type="number"
+                        name="thoigian"
+                        min="0"
+                        value="0"
+                    >
+
                 </div>
 
             </div>
 
 
-            <!-- REVIEWS -->
-            <div class="stat-card">
+            <!-- MÔ TẢ -->
 
-                <div class="stat-icon">
-                    ⭐
+            <div class="form-group">
+
+                <label>
+                    Mô tả
+                </label>
+
+                <textarea
+                    name="mota"
+                    rows="4"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ccc;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-family: Arial, sans-serif;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- CÁCH LÀM -->
+
+            <div class="form-group">
+
+                <label>
+                    Cách làm
+                </label>
+
+                <textarea
+                    name="cachlam"
+                    rows="6"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ccc;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-family: Arial, sans-serif;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- NGUYÊN LIỆU -->
+
+            <div class="ingredient-section">
+
+                <h3>
+                    🥕 Nguyên liệu
+                </h3>
+
+                <br>
+
+
+                <div id="add-ingredients">
+
+                    <div class="ingredient-row">
+
+
+                        <select
+                            name="manguyenlieu[]"
+                            onchange="updateIngredientUnit(this)"
+                        >
+
+                            {% for ingredient in ingredients %}
+
+                            <option
+                                value="{{ ingredient.manguyenlieu }}"
+                                data-unit="{{ ingredient.donvi }}"
+                            >
+                                {{ ingredient.tennguyenlieu }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        <input
+                            type="number"
+                            name="soluong[]"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="Số lượng"
+                        >
+
+
+                        <input
+                            type="text"
+                            name="donvi[]"
+                            class="ingredient-unit"
+                            readonly
+                        >
+
+
+                        <button
+                            type="button"
+                            class="btn-remove-ingredient"
+                            onclick="this.parentElement.remove()"
+                        >
+                            Xóa
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <div>
-                    <h3>Đánh giá</h3>
 
-                    <p>
-                        {{ stats.get('reviews', 0) }}
-                    </p>
+                <button
+                    type="button"
+                    class="btn-add-ingredient"
+                    onclick="addIngredient()"
+                >
+                    ＋ Thêm nguyên liệu
+                </button>
+
+
+                <div class="auto-calculated-note">
+
+                    💰 <strong>Chi phí:</strong>
+                    Tự động tính dựa trên nguyên liệu.
+
+                    <br><br>
+
+                    🔥 <strong>Kcal:</strong>
+                    Tự động tính dựa trên nguyên liệu.
+
                 </div>
 
             </div>
 
-        </div>
+
+            <br>
 
 
-        <!-- CHỨC NĂNG -->
-        <section class="admin-section">
+            <button
+                type="submit"
+                class="btn"
+            >
+                Thêm món ăn
+            </button>
 
-            <h2>Quản lý hệ thống</h2>
+            <a
+                href="{{ url_for('admin_foods') }}"
+                class="btn"
+            >
+                Hủy
+            </a>
 
-            <div class="admin-menu-grid">
+        </form>
 
-                <a href="{{ url_for('admin_foods') }}"
-                   class="admin-menu-card">
+    </div>
+    
+    <br>
 
-                    <span>🍲</span>
-
-                    <h3>Quản lý món ăn</h3>
-
-                    <p>
-                        Thêm và xóa thông tin món ăn.
-                    </p>
-
-                </a>
-
-
-                <a href="{{ url_for('admin_ingredients') }}"
-                   class="admin-menu-card">
-
-                    <span>🥕</span>
-
-                    <h3>Quản lý nguyên liệu</h3>
-
-                    <p>
-                        Quản lý danh sách nguyên liệu.
-                    </p>
-
-                </a>
+    <a
+        href="{{ url_for('admin') }}"
+        class="btn"
+    >
+        ← Quay lại quản trị
+    </a>
 
 
-                <a href="{{ url_for('admin_users') }}"
-                   class="admin-menu-card">
-
-                    <span>👤</span>
-
-                    <h3>Quản lý người dùng</h3>
-
-                    <p>
-                        Xem thông tin tài khoản người dùng.
-                    </p>
-
-                </a>
-
-            </div>
-
-        </section>
-
-    </main>
+</div>
 
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- =========================
+     JAVASCRIPT
+========================== -->
+
+<script>
+
+
+/* =====================================
+   CẬP NHẬT ĐƠN VỊ
+===================================== */
+
+function updateIngredientUnit(select) {
+
+    const row = select.parentElement;
+
+    const unitInput =
+        row.querySelector(".ingredient-unit");
+
+    const selectedOption =
+        select.options[select.selectedIndex];
+
+    if (unitInput && selectedOption) {
+
+        unitInput.value =
+            selectedOption.dataset.unit || "";
+
+    }
+
+}
+
+
+/* =====================================
+   THÊM NGUYÊN LIỆU - FORM SỬA
+===================================== */
+
+function addEditIngredient() {
+
+    const container =
+        document.getElementById(
+            "edit-ingredients"
+        );
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "ingredient-row";
+
+
+    row.innerHTML = `
+
+        <select
+            name="manguyenlieu[]"
+            onchange="updateIngredientUnit(this)"
+        >
+
+            {% for ingredient in ingredients %}
+
+            <option
+                value="{{ ingredient.manguyenlieu }}"
+                data-unit="{{ ingredient.donvi }}"
+            >
+                {{ ingredient.tennguyenlieu }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <input
+            type="number"
+            name="soluong[]"
+            min="0.01"
+            step="0.01"
+            placeholder="Số lượng"
+        >
+
+
+        <input
+            type="text"
+            name="donvi[]"
+            class="ingredient-unit"
+            readonly
+        >
+
+
+        <button
+            type="button"
+            class="btn-remove-ingredient"
+            onclick="this.parentElement.remove()"
+        >
+            Xóa
+        </button>
+
+    `;
+
+
+    container.appendChild(row);
+
+
+    const select =
+        row.querySelector(
+            'select[name="manguyenlieu[]"]'
+        );
+
+    updateIngredientUnit(select);
+
+}
+
+
+/* =====================================
+   THÊM NGUYÊN LIỆU - FORM THÊM
+===================================== */
+
+function addIngredient() {
+
+    const container =
+        document.getElementById(
+            "add-ingredients"
+        );
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "ingredient-row";
+
+
+    row.innerHTML = `
+
+        <select
+            name="manguyenlieu[]"
+            onchange="updateIngredientUnit(this)"
+        >
+
+            {% for ingredient in ingredients %}
+
+            <option
+                value="{{ ingredient.manguyenlieu }}"
+                data-unit="{{ ingredient.donvi }}"
+            >
+                {{ ingredient.tennguyenlieu }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <input
+            type="number"
+            name="soluong[]"
+            min="0.01"
+            step="0.01"
+            placeholder="Số lượng"
+        >
+
+
+        <input
+            type="text"
+            name="donvi[]"
+            class="ingredient-unit"
+            readonly
+        >
+
+
+        <button
+            type="button"
+            class="btn-remove-ingredient"
+            onclick="this.parentElement.remove()"
+        >
+            Xóa
+        </button>
+
+    `;
+
+
+    container.appendChild(row);
+
+
+    const select =
+        row.querySelector(
+            'select[name="manguyenlieu[]"]'
+        );
+
+    updateIngredientUnit(select);
+
+}
+
+
+/* =====================================
+   TỰ ĐIỀN ĐƠN VỊ DÒNG ĐẦU TIÊN
+===================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        document
+            .querySelectorAll(
+                'select[name="manguyenlieu[]"]'
+            )
+            .forEach(function (select) {
+
+                updateIngredientUnit(select);
+
+            });
+
+    }
+);
+
+</script>
+
+
 
 </body>
 

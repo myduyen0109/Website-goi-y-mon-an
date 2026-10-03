@@ -1,250 +1,356 @@
-<!DOCTYPE html>
+{% extends "user/base.html" %}
 
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+{{ food.tenmon }} - Gợi Ý Món Ăn
+{% endblock %}
 
-```
-<title>{{ food['tenmon'] }} - Gợi ý món ăn</title>
+{% block content %}
 
-<link rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}">
-```
+<div class="container">
 
-</head>
+    <h1>{{ food.tenmon }}</h1>
+    {% if session.get("manguoidung") %}
 
-<body>
+    <form
+        method="POST"
+        action="{{ url_for('favorite', mamon=food.mamon) }}"
+        style="margin: 15px 0;"
+    >
 
-```
-<!-- HEADER -->
-<header class="main-header">
-    <div class="header-container">
+        <button
+            type="submit"
+            class="favorite-button"
+        >
 
-        <a href="{{ url_for('home') }}" class="logo">
-            🍽️ Gợi ý món ăn
-        </a>
-
-        <nav class="main-nav">
-            <a href="{{ url_for('home') }}">Trang chủ</a>
-
-            <a href="{{ url_for('search') }}">
-                Tìm món ăn
-            </a>
-
-            <a href="{{ url_for('today') }}">
-                Hôm nay ăn gì?
-            </a>
-        </nav>
-
-        <div class="user-menu">
-            {% if session.get('manguoidung') %}
-
-                <span>
-                    Xin chào, {{ session.get('hoten') }}
-                </span>
-
-                <a href="{{ url_for('logout') }}">
-                    Đăng xuất
-                </a>
-
+            {% if favorite_exists %}
+                ❤️ Bỏ yêu thích
             {% else %}
-
-                <a href="{{ url_for('login') }}">
-                    Đăng nhập
-                </a>
-
-                <a href="{{ url_for('register') }}">
-                    Đăng ký
-                </a>
-
+                🤍 Thêm vào yêu thích
             {% endif %}
-        </div>
 
-    </div>
-</header>
+        </button>
 
+    </form>
 
-<!-- MAIN CONTENT -->
-<main class="food-detail-page">
-
-    <div class="food-detail-container">
-
-        <!-- NÚT QUAY LẠI -->
-        <a href="{{ url_for('search') }}" class="back-button">
-            ← Quay lại tìm món ăn
-        </a>
-
-
-        <!-- THÔNG TIN MÓN ĂN -->
-        <section class="food-detail-card">
-
-            <!-- HÌNH ĐẠI DIỆN -->
-            <div class="food-detail-image">
-
-                <div class="food-detail-placeholder">
-                    🍲
-                </div>
-
-            </div>
-
-
-            <!-- NỘI DUNG -->
-            <div class="food-detail-content">
-
-                <!-- TÊN MÓN -->
-                <h1>
-                    {{ food['tenmon'] }}
-                </h1>
-
-
-                <!-- DANH MỤC -->
-                {% if food['tendanhmuc'] %}
-                    <div class="food-detail-category">
-                        {{ food['tendanhmuc'] }}
-                    </div>
-                {% endif %}
-
-
-                <!-- MÔ TẢ -->
-                {% if food['mota'] %}
-                    <p class="food-detail-description">
-                        {{ food['mota'] }}
-                    </p>
-                {% endif %}
-
-
-                <!-- THÔNG TIN -->
-                <div class="food-detail-meta">
-
-                    {% if food['thoigian'] %}
-                        <div class="detail-info-item">
-                            <span class="detail-icon">⏱️</span>
-                            <div>
-                                <strong>Thời gian</strong>
-                                <p>
-                                    {{ food['thoigian'] }}
-                                </p>
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-                    {% if food['chiphi'] %}
-                        <div class="detail-info-item">
-                            <span class="detail-icon">💰</span>
-                            <div>
-                                <strong>Chi phí</strong>
-                                <p>
-                                    {{ food['chiphi'] }}
-                                </p>
-                            </div>
-                        </div>
-                    {% endif %}
-
-
-                    {% if food['kcal'] %}
-                        <div class="detail-info-item">
-                            <span class="detail-icon">🔥</span>
-                            <div>
-                                <strong>Năng lượng</strong>
-                                <p>
-                                    {{ food['kcal'] }} kcal
-                                </p>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- NGUYÊN LIỆU -->
-        {% if food['nguyenlieu'] %}
-            <section class="food-detail-section">
-
-                <h2>🥬 Nguyên liệu</h2>
-
-                <div class="ingredient-box">
-                    {{ food['nguyenlieu'] }}
-                </div>
-
-            </section>
-        {% endif %}
-
-
-        <!-- SỐ LƯỢNG -->
-        {% if food['soluong'] %}
-            <section class="food-detail-section">
-
-                <h2>📋 Số lượng</h2>
-
-                <div class="ingredient-box">
-                    {{ food['soluong'] }}
-                </div>
-
-            </section>
-        {% endif %}
-
-
-        <!-- ĐÁNH GIÁ -->
-        <section class="food-detail-section">
-
-            <h2>⭐ Đánh giá món ăn</h2>
-
-            <div class="rating-box">
-
-                <span class="star">☆</span>
-                <span class="star">☆</span>
-                <span class="star">☆</span>
-                <span class="star">☆</span>
-                <span class="star">☆</span>
-
-            </div>
-
-            <p class="rating-note">
-                Chức năng đánh giá sẽ được kết nối với bảng
-                <strong>tuongtacmonan</strong>.
-            </p>
-
-        </section>
-
-
-        <!-- NÚT QUAY LẠI -->
-        <div class="detail-actions">
-
-            <a href="{{ url_for('home') }}"
-               class="detail-button">
-                ← Về trang chủ
-            </a>
-
-            <a href="{{ url_for('search') }}"
-               class="detail-button">
-                🔎 Tìm món khác
-            </a>
-
-        </div>
-
-    </div>
-
-</main>
-
-
-<!-- FOOTER -->
-<footer class="main-footer">
+{% else %}
 
     <p>
-        © 2026 Gợi ý món ăn
+        <a href="{{ url_for('login') }}">
+            Đăng nhập
+        </a>
+        để thêm món ăn vào yêu thích.
     </p>
 
-</footer>
+{% endif %}
 
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-```
+    <p>
+        <strong>Danh mục:</strong>
+        {{ food.tendanhmuc or "Chưa phân loại" }}
+    </p>
 
-</body>
-</html>
+    <p>
+        <strong>Mô tả:</strong>
+        {{ food.mota or "Chưa có mô tả." }}
+    </p>
+
+    <p>
+        <strong>Thời gian:</strong>
+        {{ food.thoigian }} phút
+    </p>
+
+    <p>
+        <strong>Chi phí:</strong>
+        {{ "{:,.0f}".format(food.chiphi or 0) }} VNĐ
+    </p>
+
+    <p>
+        <strong>Năng lượng:</strong>
+        {{ food.kcal or 0 }} kcal
+    </p>
+
+    <hr>
+
+    <h2>🥕 Nguyên liệu</h2>
+
+    {% if ingredients %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Nguyên liệu</th>
+                    <th>Số lượng</th>
+                    <th>Đơn vị</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for ingredient in ingredients %}
+
+                    <tr>
+
+                        <td>
+                            {{ ingredient.tennguyenlieu }}
+                        </td>
+
+                        <td>
+                            {{ ingredient.soluong }}
+                        </td>
+
+                        <td>
+                            {{ ingredient.donvi }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <p>
+            Món ăn chưa có thông tin nguyên liệu.
+        </p>
+
+    {% endif %}
+
+    <hr>
+
+    <h2>👨‍🍳 Cách làm</h2>
+
+    <p>
+        {{ food.cachlam or "Chưa có hướng dẫn." }}
+    </p>
+
+    <br>
+    <hr>
+
+<h2>
+    ⭐
+    {% if user_review %}
+        Đánh giá của bạn
+    {% else %}
+        Đánh giá món ăn
+    {% endif %}
+</h2>
+
+{% if user_review %}
+    <p class="your-review-notice">
+        Bạn đã đánh giá món này.
+        Bạn có thể gửi lại để cập nhật đánh giá.
+    </p>
+{% endif %}
+{% if session.get("manguoidung") %}
+
+<form method="POST" action="{{ url_for('review', mamon=food.mamon) }}">
+
+    <div class="form-group">
+        <label for="diem">
+            Điểm đánh giá
+        </label>
+
+        {% if user_review %}
+    <p>
+        Đánh giá hiện tại:
+        <strong>{{ user_review.diem }}/5</strong>
+    </p>
+{% endif %}
+
+    
+
+
+<div class="rating">
+
+    <input
+        type="radio"
+        id="star5"
+        name="diem"
+        value="5"
+        {% if user_review and user_review.diem == 5 %}checked{% endif %}
+    >
+    <label for="star5">★</label>
+
+    <input
+        type="radio"
+        id="star4"
+        name="diem"
+        value="4"
+        {% if user_review and user_review.diem == 4 %}checked{% endif %}
+    >
+    <label for="star4">★</label>
+
+    <input
+        type="radio"
+        id="star3"
+        name="diem"
+        value="3"
+        {% if user_review and user_review.diem == 3 %}checked{% endif %}
+    >
+    <label for="star3">★</label>
+
+    <input
+        type="radio"
+        id="star2"
+        name="diem"
+        value="2"
+        {% if user_review and user_review.diem == 2 %}checked{% endif %}
+    >
+    <label for="star2">★</label>
+
+    <input
+        type="radio"
+        id="star1"
+        name="diem"
+        value="1"
+        {% if user_review and user_review.diem == 1 %}checked{% endif %}
+    >
+    <label for="star1">★</label>
+
+</div>
+
+    <div class="form-group">
+        <label for="binhluan">
+            Bình luận
+        </label>
+
+        <textarea
+    id="binhluan"
+    name="binhluan"
+    rows="4"
+    placeholder="Nhập nhận xét của bạn..."
+>{% if user_review %}{{ user_review.binhluan or "" }}{% endif %}</textarea>
+    </div>
+
+    <button type="submit" class="btn">
+        Gửi đánh giá
+    </button>
+
+</form>
+
+{% else %}
+
+<p>
+    <a href="{{ url_for('login') }}">Đăng nhập</a>
+    để đánh giá món ăn.
+</p>
+
+{% endif %}
+
+<hr>
+
+<hr>
+
+<h2>⭐ Đánh giá từ người dùng</h2>
+
+{% if rating_summary.so_luot_danh_gia > 0 %}
+
+    <div class="rating-summary">
+
+        <div class="average-rating">
+            <strong>
+                {{ "%.1f"|format(rating_summary.diem_trung_binh) }}
+            </strong>
+            <span>/ 5</span>
+        </div>
+
+        <div class="average-stars">
+
+            {% set avg = rating_summary.diem_trung_binh|round(0, 'floor')|int %}
+
+            {% for i in range(1, 6) %}
+
+                {% if i <= avg %}
+                    <span class="star-filled">★</span>
+                {% else %}
+                    <span class="star-empty">★</span>
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+        <p>
+            {{ rating_summary.so_luot_danh_gia }}
+            lượt đánh giá
+        </p>
+
+    </div>
+
+{% else %}
+
+    <p>
+        Chưa có đánh giá nào cho món ăn này.
+    </p>
+
+{% endif %}
+
+
+{% if reviews %}
+
+    <div class="review-list">
+
+        {% for review in reviews %}
+
+            <div class="review-item">
+
+                <div class="review-header">
+
+                    <strong>
+                        {{ review.hoten }}
+                    </strong>
+
+                    <span class="review-stars">
+
+                        {% for i in range(1, 6) %}
+
+                            {% if i <= review.diem %}
+                                <span class="star-filled">★</span>
+                            {% else %}
+                                <span class="star-empty">★</span>
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </span>
+
+                </div>
+
+                {% if review.binhluan %}
+
+                    <p>
+                        {{ review.binhluan }}
+                    </p>
+
+                {% endif %}
+
+                <small>
+                    {{ review.ngaytao.strftime("%d/%m/%Y %H:%M") }}
+                </small>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+<br>
+
+<a
+    href="{{ url_for('search') }}"
+    class="btn"
+>
+    ← Quay lại tìm kiếm
+</a>
+
+</div>
+
+{% endblock %}
+
+
